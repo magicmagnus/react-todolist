@@ -1,5 +1,5 @@
 
-name: DevOps-GitHibActions
+name: Build and Deploy to GitHub Pages
 on: push
 
 permissions:
@@ -25,12 +25,11 @@ jobs:
         with:
           name: production-files
           path: ./dist
-
   # Deploy Job
   deploy:
     # Add a dependency to the build job
     needs: build
-    # Specify runner + deployment step
+    
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact
