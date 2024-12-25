@@ -1,62 +1,37 @@
-import { useState, useEffect } from "react"
-import Main from "./components/Main"
-import SideBar from "./components/SideBar"
-import Footer from "./components/Footer"
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import Hero from './components/Hero'
+import Generator from './components/Generator'
+import Workout from './components/Workout'
+import { generateWorkout } from './utils/functions'
 
 function App() {
-	
-	const [data, setData] = useState(null)
-	const [loading, setLoading] = useState(false)
-	const [showModal, setShowModal] = useState(false)
+  const [workout, setWorkout] = useState(null)
+  
+  const [poison, setPoison] = useState('individual')
+  const [muscles, setMuscles] = useState([])
+  const [goal, setGoal] = useState('strength_power')
 
-	function handleToggleModal() {
-		setShowModal(!showModal)
-	}
+  function updateWorkout() {
+    if (muscles.length < 1) {
+      return
+    }
+    let newWorkout = generateWorkout({poison, muscles, goal})
+    console.log(newWorkout)
+    setWorkout(newWorkout)
+    window.location.href = '#workout'
+  }
 
-	useEffect(() => {
-		const NASA_KEY = import.meta.env.VITE_NASA_API_KEY
-		async function fetchAPI() {
-			const url = "https://api.nasa.gov/planetary/apod" + 
-			`?api_key=${NASA_KEY}`
-
-			const today = new Date().toDateString()
-			const localKey = `NASA-${today}`
-
-			if (localStorage.getItem(localKey)) {
-				setData(JSON.parse(localStorage.getItem(localKey)))
-				console.log("Data fetched from local storage")
-				return
-			}
-			localStorage.removeItem(localKey)
-			try {
-				const res = await fetch(url)
-				const apiData = await res.json()
-				localStorage.setItem(localKey, JSON.stringify(apiData))
-				setData(apiData)
-				console.log("Data fetched from API")
-			} catch (error) {
-				console.error(error.message)
-			}
-		}
-		fetchAPI()
-		
-	}, [])
-	
-	return (
-		<>
-			{data ? (<Main data={data} />) : (
-			<div className="loadingState">
-				<i className="fa-solid fa-gear"></i>
-			</div>
-			)}
-			{showModal && 
-			(
-			<SideBar data={data} handleToggleModal={handleToggleModal}/>
-			)}
-			{data && (<Footer data={data} showModal={showModal} handleToggleModal={handleToggleModal}/>)}
-
-		</>
-	)
+  return (
+    <main className='min-h-screen flex flex-col  bg-gradient-to-r from-slate-800 to-slate-950 text-white text-sm sm:text-base'>
+      <Hero />
+      <Generator poison={poison} muscles={muscles} goal={goal} 
+              setPoison={setPoison} setMuscles={setMuscles} setGoal={setGoal}
+              updateWorkout={updateWorkout}/>
+      {workout && (<Workout workout={workout}/>)}
+    </main>
+  )
 }
 
 export default App
